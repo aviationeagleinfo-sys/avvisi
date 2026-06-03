@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviation Eagle - Portale Avvisi</title>
+    <link rel="icon" type="image/png" href="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Avvisi-Icon-RBG.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 50%, #f9fafb 0%, #f3f4f6 100%);
+            color: #1f2937;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #111827;
+        }
+        .glass-input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="glass-panel sticky top-0 z-50 px-6 py-3 flex justify-between items-center border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+            <img src="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Ex-RGB.png" alt="Aviation Eagle Logo" class="h-8 w-auto object-contain">
+            <span class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300 font-medium">Operations</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a href="https://news.aviationeagle.co.uk" target="_blank" class="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1">
+                <i class="fa-solid fa-newspaper text-xs"></i>
+                <span>Comunicati Stampa</span>
+            </a>
+            <div id="auth-status-container" class="flex items-center space-x-3">
+                <button id="btn-show-login" class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all font-medium shadow-sm">
+                    Accedi
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+        <div id="login-panel" class="hidden max-w-md mx-auto glass-panel p-6 rounded-2xl shadow-xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-blue-600"></i> Autenticazione Operativa
+                </h3>
+                <button id="btn-close-login" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full p-2.5 rounded-lg glass-input text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full p-2.5 rounded-lg glass-input text-sm">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
+                    Verifica Credenziali
+                </button>
+            </form>
+        </div>
+
+        <div id="admin-panel" class="hidden glass-panel p-6 rounded-2xl border-l-4 border-l-blue-600 space-y-4 shadow-sm">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold tracking-wide text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-blue-600"></i> Console Amministrazione Avvisi
+                </h2>
+                <span class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full border border-blue-200 font-mono font-bold">ADMIN MODE</span>
+            </div>
+            
+            <form id="notice-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="hidden" id="notice-id"> 
+                
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titolo dell'Avviso</label>
+                    <input type="text" id="notice-title" required class="w-full p-2.5 rounded-lg glass-input text-sm" placeholder="Es: Sospensione voli temporanea NOTAM...">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipologia</label>
+                    <select id="notice-type" class="w-full p-2.5 rounded-lg glass-input text-sm bg-white">
+                        <option value="Operativo">Operativo</option>
+                        <option value="Meteo">Meteo / NOTAM</option>
+                        <option value="Flotta">Flotta & Network</option>
+                        <option value="Generale">Generale</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Corpo del Messaggio / Dettagli</label>
+                    <textarea id="notice-body" required rows="3" class="w-full p-2.5 rounded-lg glass-input text-sm" placeholder="Inserisci i dettagli operativi completi..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Livello di Importanza</label>
+                    <select id="notice-severity" class="w-full p-2.5 rounded-lg glass-input text-sm bg-white">
+                        <option value="Low">Bassa (Info / Routine)</option>
+                        <option value="Medium">Media (Attenzione Richiesta)</option>
+                        <option value="High">Alta (Criticità / Urgente)</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-3 p-4 bg-gray-50/50 rounded-xl border border-gray-200/60 space-y-3">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        <i class="fa-brands fa-github text-sm text-gray-900"></i>
+                        <span>Integrazione Pagine di Dettaglio (GitHub Pages)</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="flex items-center h-full pt-2">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="generate-gh-page" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700">Genera pagina web dedicata su GitHub</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="password" id="gh-token" class="w-full p-2 rounded-lg glass-input text-xs" placeholder="Inserisci GitHub Personal Access Token (PAT)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Link Esterno Alternativo / Documentazione Esistente</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 text-sm">
+                            <i class="fa-solid fa-link"></i>
+                        </span>
+                        <input type="url" id="notice-link" class="w-full p-2.5 pl-9 rounded-lg glass-input text-sm" placeholder="https://example.com/dettagli-operativi (Lascia vuoto se usi la pagina GitHub)">
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 flex justify-end space-x-2 pt-2">
+                    <button type="button" id="btn-cancel-edit" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors">
+                        Annulla
+                    </button>
+                    <button type="submit" id="btn-submit-notice" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
+                        Pubblica Avviso
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold tracking-wide text-gray-900 flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-amber-500"></i> Feed Avvisi Attivi
+            </h2>
+            <div id="notices-feed" class="grid grid-cols-1 gap-4">
+                <div class="text-center py-12 text-gray-400 text-sm glass-panel rounded-xl">
+                    <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 text-blue-600"></i>
+                    <p>Sincronizzazione con il database di rete in corso...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="glass-panel mt-auto py-4 text-center text-xs text-gray-500 border-t border-gray-200">
+        &copy; 2026 Aviation Eagle Network. Tutti i diritti riservati. Monitoraggio Operativo.
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3FP3zjoGUAxk0OK3U_ljGkefP5s2KeDc",
+            authDomain: "avvisi-ae.firebaseapp.com",
+            projectId: "avvisi-ae",
+            storageBucket: "avvisi-ae.firebasestorage.app",
+            messagingSenderId: "399548092395",
+            appId: "1:399548092395:web:2e8516d2c9ad8781df53ae"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Configurazione Repository GitHub
+        const GH_OWNER = "aviationeagleinfo-sys"; // Il tuo username o org GitHub
+        const GH_REPO = "avvisi"; // Nome del repository
+        const GH_BRANCH = "main"; // O "master" a seconda del repository
+
+        const adminWhitelist = ["aviationeagle.info@gmail.com", "avvisi.aviationeagle@gmail.com"];
+        let currentAdminState = false;
+
+        const loginPanel = document.getElementById('login-panel');
+        const adminPanel = document.getElementById('admin-panel');
+        const btnShowLogin = document.getElementById('btn-show-login');
+        const btnCloseLogin = document.getElementById('btn-close-login');
+        const loginForm = document.getElementById('login-form');
+        const authStatusContainer = document.getElementById('auth-status-container');
+        const noticeForm = document.getElementById('notice-form');
+        const noticesFeed = document.getElementById('notices-feed');
+        const btnSubmitNotice = document.getElementById('btn-submit-notice');
+        const btnCancelEdit = document.getElementById('btn-cancel-edit');
+
+        btnShowLogin.addEventListener('click', () => loginPanel.classList.toggle('hidden'));
+        btnCloseLogin.addEventListener('click', () => loginPanel.classList.add('hidden'));
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                loginForm.reset();
+                loginPanel.classList.add('hidden');
+            } catch (error) {
+                alert("Errore di autenticazione: " + error.message);
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && adminWhitelist.includes(user.email.toLowerCase())) {
+                currentAdminState = true;
+                adminPanel.classList.remove('hidden');
+                
+                authStatusContainer.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs text-green-600 font-mono font-bold hidden md:inline"><i class="fa-solid fa-user-shield"></i> ${user.email}</span>
+                        <button id="btn-logout" class="text-sm bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg transition-all font-medium">
+                            Disconnetti
+                        </button>
+                    </div>
+                `;
+                document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+            } else {
+                currentAdminState = false;
+                adminPanel.classList.add('hidden');
+                resetForm();
+                authStatusContainer.innerHTML = `
+                    <button id="btn-show-login" class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all font-medium shadow-sm">
+                        Accedi
+                    </button>
+                `;
+                document.getElementById('btn-show-login').addEventListener('click', () => loginPanel.classList.toggle('hidden'));
+                if (user) {
+                    alert("Account non presente nella whitelist degli amministratori.");
+                    signOut(auth);
+                }
+            }
+            loadNotices();
+        });
+
+        // Generatore di file HTML basato su Template per le News Ingrandite
+        function generateTemplateHtml(title, type, body, severity, dateStr) {
+            return `<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - Aviation Eagle Operations</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 50%, #f9fafb 0%, #f3f4f6 100%);
+            color: #1f2937;
+            font-family: system-ui, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-8">
+    <main class="max-w-3xl w-full mx-auto my-auto glass-panel p-6 md:p-10 rounded-3xl shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-gray-200/80 pb-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-xs bg-blue-600 text-white px-2.5 py-0.5 rounded font-mono font-bold">${severity.toUpperCase()}</span>
+                <span class="text-xs bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded font-semibold">${type}</span>
+            </div>
+            <span class="text-xs text-gray-400 font-mono"><i class="fa-regular fa-clock"></i> ${dateStr} LT</span>
+        </div>
+        
+        <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug">${title}</h1>
+        
+        <div class="text-gray-700 text-base md:text-lg whitespace-pre-wrap leading-relaxed space-y-4 pt-2">
+            ${body}
+        </div>
+
+        <div class="pt-6 border-t border-gray-200/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <img src="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Ex-RGB.png" alt="Logo" class="h-6 w-auto object-contain">
+                <span class="text-xs text-gray-400 font-medium">Aviation Eagle Operations Network</span>
+            </div>
+            <button onclick="window.close()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors font-medium">
+                Chiudi Finestra
+            </button>
+        </div>
+    </main>
+</body>
+</html>`;
+        }
+
+        // Funzione per eseguire il push diretto su GitHub tramite API REST
+        async function pushToGitHub(filename, htmlContent, token) {
+            const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/news/${filename}`;
+            const base64Content = btoa(unescape(encodeURIComponent(htmlContent)));
+            
+            // Verifica se il file esiste già per ottenere lo SHA (necessario per l'update)
+            let sha = null;
+            try {
+                const res = await fetch(url, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                }
+            } catch (e) { console.log("Nuovo file, nessuno SHA precedente trovato."); }
+
+            const bodyData = {
+                message: `Dettaglio Avviso Operativo: ${filename.replace('.html', '')}`,
+                content: base64Content,
+                branch: GH_BRANCH
+            };
+            if (sha) bodyData.sha = sha;
+
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.message || "Errore nella comunicazione con l'API GitHub");
+            }
+            
+            // Restituisce l'indirizzo pubblico finale su GitHub Pages
+            return `https://${GH_OWNER}.github.io/${GH_REPO}/news/${filename}`;
+        }
+
+        noticeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const noticeId = document.getElementById('notice-id').value;
+            const title = document.getElementById('notice-title').value;
+            const type = document.getElementById('notice-type').value;
+            const body = document.getElementById('notice-body').value;
+            const severity = document.getElementById('notice-severity').value;
+            let link = document.getElementById('notice-link').value.trim();
+            const generateGh = document.getElementById('generate-gh-page').checked;
+            const ghToken = document.getElementById('gh-token').value.trim();
+
+            const timestamp = new Date().getTime();
+            const dateStr = new Date(timestamp).toLocaleString('it-IT', { timeZone: 'Europe/Rome' });
+
+            if (generateGh) {
+                if (!ghToken) {
+                    alert("È necessario inserire un Personal Access Token (PAT) di GitHub valido per generare la pagina.");
+                    return;
+                }
+                btnSubmitNotice.innerText = "Generazione pagina GitHub in corso...";
+                btnSubmitNotice.disabled = true;
+
+                // Creazione del nome file pulito e sicuro basato sul titolo
+                const safeFileName = title.toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '') + `-${timestamp}.html`;
+
+                try {
+                    const generatedHtml = generateTemplateHtml(title, type, body, severity, dateStr);
+                    link = await pushToGitHub(safeFileName, generatedHtml, ghToken);
+                } catch (error) {
+                    alert("Errore durante il deployment su GitHub: " + error.message);
+                    btnSubmitNotice.disabled = false;
+                    btnSubmitNotice.innerText = noticeId ? "Aggiorna Avviso" : "Pubblica Avviso";
+                    return;
+                }
+            }
+
+            const noticeData = {
+                title: title,
+                type: type,
+                body: body,
+                severity: severity,
+                link: link || "",
+                timestamp: timestamp
+            };
+
+            try {
+                if (noticeId) {
+                    const docRef = doc(db, "avvisi", noticeId);
+                    await updateDoc(docRef, noticeData);
+                } else {
+                    await addDoc(collection(db, "avvisi"), noticeData);
+                }
+                resetForm();
+            } catch (error) {
+                alert("Errore nel salvataggio su Firestore: " + error.message);
+            } finally {
+                btnSubmitNotice.disabled = false;
+            }
+        });
+
+        function loadNotices() {
+            const q = query(collection(db, "avvisi"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                noticesFeed.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    noticesFeed.innerHTML = `
+                        <div class="glass-panel p-8 rounded-xl text-center text-gray-400 text-sm">
+                            Nessun avviso operativo registrato al momento.
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const dateStr = new Date(data.timestamp).toLocaleString('it-IT', { timeZone: 'Europe/Rome' });
+                    const hasLink = data.link && data.link !== "";
+                    
+                    let severityColor = "border-l-gray-400 bg-gray-500/5";
+                    let severityBadge = "bg-gray-100 text-gray-700 border border-gray-200";
+                    if (data.severity === "Medium") {
+                        severityColor = "border-l-amber-500 bg-amber-500/5";
+                        severityBadge = "bg-amber-50 text-amber-700 border border-amber-200";
+                    } else if (data.severity === "High") {
+                        severityColor = "border-l-red-500 bg-red-500/5 shadow-[inset_0_0_15px_rgba(239,68,68,0.02)]";
+                        severityBadge = "bg-red-50 text-red-700 border border-red-200 font-bold animate-pulse";
+                    }
+
+                    // Identifica se il link associato appartiene al dominio delle pagine automatiche di GitHub
+                    const isGitHubPage = data.link && data.link.includes("github.io");
+
+                    let linkButtonHtml = "";
+                    if (hasLink) {
+                        linkButtonHtml = `
+                            <div class="mt-3">
+                                <a href="${escapeHtml(data.link)}" target="_blank" class="inline-flex items-center space-x-2 text-xs font-semibold ${isGitHubPage ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'} border px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                                    <i class="${isGitHubPage ? 'fa-solid fa-book-open' : 'fa-solid fa-arrow-up-right-from-square'} text-[10px]"></i>
+                                    <span>${isGitHubPage ? 'Leggi Dettaglio Completo' : 'Apri Documentazione Esterna'}</span>
+                                </a>
+                            </div>
+                        `;
+                    }
+
+                    let adminActions = "";
+                    if (currentAdminState) {
+                        adminActions = `
+                            <div class="flex space-x-2 mt-4 md:mt-0 md:ml-4 justify-end">
+                                <button onclick="editNotice('${id}', \`${escapeHtml(data.title)}\`, \`${escapeHtml(data.type)}\`, \`${escapeHtml(data.body)}\`, \`${data.severity}\`, \`${escapeHtml(data.link || '')}\`)" class="text-xs bg-blue-50 border border-blue-200 text-blue-600 px-3 py-1 rounded hover:bg-blue-100 transition-all flex items-center gap-1 font-medium">
+                                    <i class="fa-solid fa-pen-to-square"></i> Modifica
+                                </button>
+                                <button onclick="deleteNotice('${id}')" class="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1 rounded hover:bg-red-100 transition-all flex items-center gap-1 font-medium">
+                                    <i class="fa-solid fa-trash"></i> Elimina
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    const noticeHtml = `
+                        <div class="glass-panel p-5 rounded-xl border-l-4 ${severityColor} flex flex-col md:flex-row md:items-center justify-between transition-all hover:scale-[1.002] shadow-sm">
+                            <div class="space-y-2 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${severityBadge}">${data.severity.toUpperCase()}</span>
+                                    <span class="text-xs bg-gray-100 text-blue-600 border border-gray-200 px-2 py-0.5 rounded font-semibold">${data.type}</span>
+                                    <span class="text-xs text-gray-400 font-mono"><i class="fa-regular fa-clock"></i> ${dateStr} LT</span>
+                                </div>
+                                <h3 class="text-base font-bold text-gray-900 tracking-wide">${data.title}</h3>
+                                <p class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">${data.body}</p>
+                                ${linkButtonHtml}
+                            </div>
+                            ${adminActions}
+                        </div>
+                    `;
+                    noticesFeed.innerHTML += noticeHtml;
+                });
+            });
+        }
+
+        window.deleteNotice = async function(id) {
+            if (confirm("Confermi l'eliminazione definitiva di questo avviso dal network?")) {
+                try {
+                    await deleteDoc(doc(db, "avvisi", id));
+                } catch (error) {
+                    alert("Errore nell'eliminazione: " + error.message);
+                }
+            }
+        }
+
+        window.editNotice = function(id, title, type, body, severity, link) {
+            document.getElementById('notice-id').value = id;
+            document.getElementById('notice-title').value = title;
+            document.getElementById('notice-type').value = type;
+            document.getElementById('notice-body').value = body;
+            document.getElementById('notice-severity').value = severity;
+            document.getElementById('notice-link').value = link === "undefined" ? "" : link;
+
+            btnSubmitNotice.innerText = "Aggiorna Avviso";
+            btnSubmitNotice.classList.replace('bg-green-600', 'bg-blue-600');
+            btnSubmitNotice.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            btnCancelEdit.classList.remove('hidden');
+            
+            adminPanel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        btnCancelEdit.addEventListener('click', resetForm);
+
+        function resetForm() {
+            noticeForm.reset();
+            document.getElementById('notice-id').value = "";
+            document.getElementById('generate-gh-page').checked = false;
+            btnSubmitNotice.innerText = "Pubblica Avviso";
+            btnSubmitNotice.classList.replace('bg-blue-600', 'bg-green-600');
+            btnSubmitNotice.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            btnCancelEdit.classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
