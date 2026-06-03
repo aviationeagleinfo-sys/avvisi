@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviation Eagle - Portale Avvisi</title>
-    <link rel="icon" type="image/png" href="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Avvisi-Icon-RBG.png">
+    <link class="rounded-full" rel="icon" type="image/png" href="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Avvisi-Icon-RBG.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -103,17 +103,17 @@
                     </select>
                 </div>
 
-                <div id="strike-logos-section" class="hidden md:col-span-3 p-4 bg-amber-50/40 rounded-xl border border-amber-200/60 space-y-2">
-                    <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider"><i class="fa-solid fa-users-slash"></i> Loghi Compagnie / Enti Coinvolti nello Sciopero</label>
-                    <div class="flex flex-wrap gap-4 text-sm text-gray-700 pt-1">
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="ITA Airways" class="rounded text-blue-600"> <span>ITA Airways</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="Ryanair" class="rounded text-blue-600"> <span>Ryanair</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="Wizz Air" class="rounded text-blue-600"> <span>Wizz Air</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="Lufthansa" class="rounded text-blue-600"> <span>Lufthansa</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="EasyJet" class="rounded text-blue-600"> <span>EasyJet</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="Aeroitalia" class="rounded text-blue-600"> <span>Aeroitalia</span></label>
-                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" name="strike-brands" value="Enav / Controllori" class="rounded text-blue-600"> <span>ENAV / ATC</span></label>
+                <div id="strike-logos-section" class="hidden md:col-span-3 p-4 bg-blue-50/30 rounded-xl border border-gray-200/60 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                            <i class="fa-solid fa-plane-arrival text-blue-600 mr-1"></i> Loghi Compagnie / Enti Coinvolti
+                        </label>
+                        <button type="button" id="btn-add-logo" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-plus"></i> Aggiungi Logo
+                        </button>
                     </div>
+                    <div id="dynamic-logos-container" class="space-y-2">
+                        </div>
                 </div>
 
                 <div class="md:col-span-2">
@@ -133,7 +133,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Stile Template Grafico</label>
                         <select id="notice-template-variant" class="w-full p-2.5 rounded-lg glass-input text-sm bg-white">
-                            </select>
+                        </select>
                     </div>
                 </div>
 
@@ -222,17 +222,6 @@
             extendedWithBg: "https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Avvisi-Ex.png"
         };
 
-        // Mappatura icone/loghi per sciopero (Placeholder stilizzati graficamente o loghi effettivi)
-        const STRIKE_BRAND_ICONS = {
-            "ITA Airways": '<span class="px-2 py-0.5 bg-blue-900 text-white font-bold rounded text-xs">ITA</span>',
-            "Ryanair": '<span class="px-2 py-0.5 bg-yellow-400 text-blue-950 font-extrabold rounded text-xs">RYR</span>',
-            "Wizz Air": '<span class="px-2 py-0.5 bg-pink-600 text-white font-bold rounded text-xs">WIZZ</span>',
-            "Lufthansa": '<span class="px-2 py-0.5 bg-yellow-500 text-slate-900 font-bold rounded text-xs">DLH</span>',
-            "EasyJet": '<span class="px-2 py-0.5 bg-orange-500 text-white font-bold rounded text-xs">EZY</span>',
-            "Aeroitalia": '<span class="px-2 py-0.5 bg-yellow-400 text-green-700 font-black rounded text-xs">AEI</span>',
-            "Enav / Controllori": '<span class="px-2 py-0.5 bg-slate-700 text-white font-mono rounded text-xs"><i class="fa-solid fa-tower-cell"></i> ATC</span>'
-        };
-
         const GH_OWNER = "aviationeagleinfo-sys"; 
         const GH_REPO = "avvisi"; 
         const GH_BRANCH = "main"; 
@@ -252,8 +241,33 @@
         const btnCancelEdit = document.getElementById('btn-cancel-edit');
         const noticeTypeSelect = document.getElementById('notice-type');
         const strikeLogosSection = document.getElementById('strike-logos-section');
+        const dynamicLogosContainer = document.getElementById('dynamic-logos-container');
+        const btnAddLogo = document.getElementById('btn-add-logo');
         const severitySelect = document.getElementById('notice-severity');
         const variantSelect = document.getElementById('notice-template-variant');
+
+        // Funzione per generare righe di loghi dinamici infiniti
+        function createLogoRow(url = '', alt = '') {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-white/60 p-2 rounded-xl border border-gray-200/50 logo-row';
+            row.innerHTML = `
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <input type="url" placeholder="URL Logo (es. https://...)" value="${escapeHtml(url)}" class="logo-url w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-blue-500 bg-white">
+                    <input type="text" placeholder="Nome Compagnia / Alt Text (es. Ryanair)" value="${escapeHtml(alt)}" class="logo-alt w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-blue-500 bg-white">
+                </div>
+                <button type="button" class="btn-remove-logo text-red-500 hover:text-red-700 p-2 transition-colors">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+            `;
+            
+            row.querySelector('.btn-remove-logo').addEventListener('click', () => {
+                row.remove();
+            });
+            
+            dynamicLogosContainer.appendChild(row);
+        }
+
+        btnAddLogo.addEventListener('click', () => createLogoRow('', ''));
 
         // Configurazione dinamica varianti template basate sulla gravità
         const templateVariants = {
@@ -288,9 +302,12 @@
         noticeTypeSelect.addEventListener('change', () => {
             if (noticeTypeSelect.value === "Sciopero") {
                 strikeLogosSection.classList.remove('hidden');
+                if (dynamicLogosContainer.children.length === 0) {
+                    createLogoRow('', '');
+                }
             } else {
                 strikeLogosSection.classList.add('hidden');
-                document.querySelectorAll('input[name="strike-brands"]').forEach(cb => cb.checked = false);
+                dynamicLogosContainer.innerHTML = '';
             }
         });
 
@@ -350,48 +367,66 @@
             loadNotices();
         });
 
-        // Motore di Generazione dei Template Grafici
+        // Motore di Generazione dei Template Grafici (Glassmorphism Estetico e Tema Chiaro Elegante)
         function generateTemplateHtml(title, type, body, severity, variant, dateStr, strikeBrands) {
-            let bodyStyle = "background: radial-gradient(circle at 50% 50%, #f9fafb 0%, #f3f4f6 100%);";
-            let containerClass = "glass-panel p-6 md:p-10 rounded-3xl shadow-xl border-t-4 border-blue-600";
-            let badgeSeverityClass = "bg-blue-600 text-white";
+            let bodyStyle = "background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); background-attachment: fixed;";
+            let containerStyles = "background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.65); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.04);";
+            let containerClass = "p-6 md:p-12 rounded-[32px] transition-all duration-300";
+            let badgeSeverityClass = "bg-blue-500/10 text-blue-700 border border-blue-200/60 shadow-sm";
 
-            // Sezione loghi sciopero nel template
+            // Sezione loghi dinamici nel template
             let strikeLogosHtml = "";
             if (type === "Sciopero" && strikeBrands && strikeBrands.length > 0) {
-                let items = strikeBrands.map(b => STRIKE_BRAND_ICONS[b] || `<span class="text-xs bg-gray-200 px-2 py-0.5 rounded">${b}</span>`).join(' ');
+                let items = strikeBrands.map(b => {
+                    if (typeof b === 'string') {
+                        return `<span class="text-xs bg-white/80 text-gray-700 font-semibold px-3 py-1.5 rounded-xl border border-gray-200/50 shadow-sm">${b}</span>`;
+                    }
+                    return `<div class="inline-flex items-center gap-2 bg-white/80 border border-white/90 px-3 py-1.5 rounded-xl shadow-sm backdrop-blur-md">
+                        ${b.url ? `<img src="${b.url}" alt="${b.alt || 'Logo'}" class="h-5 w-auto object-contain max-w-[100px]" onerror="this.style.display='none'">` : ''}
+                        ${b.alt ? `<span class="text-xs font-semibold text-gray-800">${b.alt}</span>` : ''}
+                    </div>`;
+                }).join(' ');
+                
                 strikeLogosHtml = `
-                    <div class="mt-2 p-3 bg-gray-50/80 rounded-xl border border-gray-200/60 flex flex-wrap items-center gap-2">
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mr-1">Vettori/Enti Coinvolti:</span>
-                        ${items}
+                    <div class="mt-4 p-4 bg-white/20 rounded-2xl border border-white/40 flex flex-wrap items-center gap-3">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mr-1"><i class="fa-solid fa-circle-info text-blue-500/70 mr-1"></i>Operatori Coinvolti:</span>
+                        <div class="flex flex-wrap items-center gap-2">${items}</div>
                     </div>
                 `;
             }
 
-            // Selezione ed elaborazione varianti d'urgenza
-            if (severity === "Medium") {
-                badgeSeverityClass = "bg-amber-500 text-white";
-                if (variant === "attention") {
-                    containerClass = "bg-white/80 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-xl border-l-8 border-amber-500";
+            // Selezione ed elaborazione varianti d'urgenza su Tema Chiaro + Glassmorphic
+            if (severity === "Low") {
+                badgeSeverityClass = "bg-slate-500/10 text-slate-700 border border-slate-200/50";
+                if (variant === "minimal") {
+                    containerClass += " max-w-2xl border-none shadow-sm";
+                    containerStyles = "background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);";
                 } else {
-                    containerClass = "bg-amber-50/20 backdrop-blur-md p-6 md:p-10 rounded-2xl shadow-md border border-amber-300";
+                    containerClass += " border-t-4 border-t-slate-400";
+                }
+            } else if (severity === "Medium") {
+                badgeSeverityClass = "bg-amber-500/10 text-amber-800 border border-amber-200/60 font-semibold";
+                if (variant === "attention") {
+                    containerClass += " border-l-8 border-l-amber-400";
+                    containerStyles = "background: rgba(255, 254, 243, 0.5); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 25px 50px -12px rgba(217, 119, 6, 0.05);";
+                } else {
+                    containerClass += " border-t-4 border-t-amber-400";
                 }
             } else if (severity === "High") {
-                badgeSeverityClass = "bg-red-600 text-white animate-pulse font-bold";
+                badgeSeverityClass = "bg-red-500/10 text-red-700 border border-red-200/60 font-bold animate-pulse";
                 if (variant === "flash") {
-                    bodyStyle = "background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);";
-                    containerClass = "bg-white p-6 md:p-10 rounded-3xl shadow-2xl border-2 border-red-500 shadow-red-100";
+                    bodyStyle = "background: radial-gradient(circle at top right, #fff5f5 0%, #f1f5f9 100%); background-attachment: fixed;";
+                    containerClass += " border-2 border-red-400/40 shadow-xl shadow-red-500/5";
+                    containerStyles = "background: rgba(255, 245, 245, 0.45); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.8);";
                 } else {
-                    containerClass = "bg-stone-900 text-stone-100 p-6 md:p-10 rounded-none border-l-4 border-red-600 shadow-2xl";
-                }
-            } else {
-                if (variant === "minimal") {
-                    containerClass = "bg-white p-4 md:p-8 rounded-lg shadow-sm border border-gray-100";
+                    // emergency - Frosted glass raffinato con accenti rossi decisi invece del vecchio stone-900 scuro
+                    containerClass += " border-l-4 border-l-red-600";
+                    containerStyles = "background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 30px 60px rgba(220, 38, 38, 0.06);";
                 }
             }
 
-            const textColorClass = variant === "emergency" ? "text-stone-300" : "text-gray-700";
-            const titleColorClass = variant === "emergency" ? "text-white" : "text-gray-900";
+            const textColorClass = "text-gray-700";
+            const titleColorClass = "text-gray-900";
 
             return `<!DOCTYPE html>
 <html lang="it">
@@ -402,34 +437,34 @@
     <script src="https://cdn.tailwindcss.com"><\/script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { ${bodyStyle} min-h-screen flex flex-col p-4 md:p-8; }
-        .glass-panel { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
+        body { ${bodyStyle} min-h-screen flex flex-col p-4 md:p-8 justify-center items-center; font-family: system-ui, -apple-system, sans-serif; }
+        .glass-card { ${containerStyles} }
     </style>
 </head>
 <body>
-    <main class="max-w-3xl w-full mx-auto my-auto ${containerClass} space-y-6">
-        <div class="flex items-center justify-between border-b border-gray-200/80 pb-4">
-            <div class="flex items-center space-x-2">
-                <span class="text-xs px-2.5 py-0.5 rounded font-mono font-bold ${badgeSeverityClass}">${severity.toUpperCase()}</span>
-                <span class="text-xs bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded font-semibold">${type}</span>
+    <main class="max-w-3xl w-full mx-auto glass-card ${containerClass} space-y-6">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-5">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-xs px-2.5 py-1 rounded-lg font-mono tracking-wider ${badgeSeverityClass}">${severity.toUpperCase()}</span>
+                <span class="text-xs bg-white/60 text-gray-600 border border-gray-200/40 px-2.5 py-1 rounded-lg font-semibold shadow-sm">${type}</span>
             </div>
-            <span class="text-xs text-gray-400 font-mono"><i class="fa-regular fa-clock"></i> ${dateStr} LT</span>
+            <span class="text-xs text-gray-400 font-mono bg-white/40 px-2 py-1 rounded-md border border-gray-200/20"><i class="fa-regular fa-clock text-gray-400 mr-1"></i>${dateStr} LT</span>
         </div>
         
-        <h1 class="text-2xl md:text-3xl font-extrabold ${titleColorClass} tracking-tight leading-snug">${title}</h1>
+        <h1 class="text-2xl md:text-3xl font-extrabold ${titleColorClass} tracking-tight leading-snug drop-shadow-sm">${title}</h1>
         
         ${strikeLogosHtml}
 
-        <div class="${textColorClass} text-base md:text-lg whitespace-pre-wrap leading-relaxed space-y-4 pt-2">
+        <div class="${textColorClass} text-base md:text-lg whitespace-pre-wrap leading-relaxed space-y-4 pt-2 font-normal">
             ${body}
         </div>
 
-        <div class="pt-6 border-t border-gray-200/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="pt-6 border-t border-gray-200/50 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <img src="${LOGOS.extendedTransparent}" alt="Logo" class="h-6 w-auto object-contain">
-                <span class="text-xs text-gray-400 font-medium">Aviation Eagle Operations Network</span>
+                <img src="${LOGOS.extendedTransparent}" alt="Logo" class="h-6 w-auto object-contain filter drop-shadow-sm">
+                <span class="text-xs text-gray-400 font-medium tracking-wide">Aviation Eagle Operations Network</span>
             </div>
-            <button onclick="window.close()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors font-medium">
+            <button onclick="window.close()" class="text-xs bg-white/80 hover:bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-all font-medium shadow-sm active:scale-95">
                 Chiudi Finestra
             </button>
         </div>
@@ -505,11 +540,15 @@
             const generateGh = document.getElementById('generate-gh-page').checked;
             const ghToken = document.getElementById('gh-token').value.trim();
 
-            // Estrazione brand selezionati per sciopero
+            // Estrazione dinamica loghi inseriti
             const checkedBrands = [];
             if (type === "Sciopero") {
-                document.querySelectorAll('input[name="strike-brands"]:checked').forEach(cb => {
-                    checkedBrands.push(cb.value);
+                document.querySelectorAll('.logo-row').forEach(row => {
+                    const u = row.querySelector('.logo-url').value.trim();
+                    const a = row.querySelector('.logo-alt').value.trim();
+                    if (u || a) {
+                        checkedBrands.push({ url: u, alt: a });
+                    }
                 });
             }
 
@@ -629,10 +668,18 @@
                         `;
                     }
 
-                    // Sezione loghi sciopero visibile sul feed riassuntivo
+                    // Sezione loghi sciopero visibile sul feed riassuntivo del pannello principale
                     let feedStrikeBrandsHtml = "";
                     if (data.type === "Sciopero" && data.strikeBrands && data.strikeBrands.length > 0) {
-                        let badges = data.strikeBrands.map(b => `<span class="text-[10px] font-semibold bg-gray-100 text-gray-800 border border-gray-200 px-1.5 py-0.5 rounded">${b}</span>`).join(' ');
+                        let badges = data.strikeBrands.map(b => {
+                            if (typeof b === 'string') {
+                                return `<span class="text-[10px] font-semibold bg-gray-100 text-gray-800 border border-gray-200 px-1.5 py-0.5 rounded">${b}</span>`;
+                            }
+                            return `<span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-white/80 text-gray-800 border border-gray-200/60 px-1.5 py-0.5 rounded shadow-sm">
+                                ${b.url ? `<img src="${escapeHtml(b.url)}" class="h-3 w-auto object-contain" onerror="this.style.display='none'">` : ''}
+                                <span>${escapeHtml(b.alt || 'Logo')}</span>
+                            </span>`;
+                        }).join(' ');
                         feedStrikeBrandsHtml = `<div class="flex flex-wrap gap-1 items-center mt-1"><span class="text-[10px] text-gray-400 uppercase font-bold mr-1">Target:</span> ${badges}</div>`;
                     }
 
@@ -640,7 +687,7 @@
                     if (currentAdminState) {
                         adminActions = `
                             <div class="flex space-x-2 mt-4 md:mt-0 md:ml-4 justify-end">
-                                <button onclick="editNotice('${id}', \`${escapeHtml(data.title)}\`, \`${escapeHtml(data.type)}\`, \`${escapeHtml(data.body)}\`, \`${data.severity}\`, \`${escapeHtml(data.link || '')}\`, \`${JSON.stringify(data.strikeBrands || [])}\`)" class="text-xs bg-blue-50 border border-blue-200 text-blue-600 px-3 py-1 rounded hover:bg-blue-100 transition-all flex items-center gap-1 font-medium">
+                                <button onclick="editNotice('${id}', \`${escapeHtml(data.title)}\`, \`${escapeHtml(data.type)}\`, \`${escapeHtml(data.body)}\`, \`${data.severity}\`, \`${escapeHtml(data.link || '')}\`, \`${escapeHtml(JSON.stringify(data.strikeBrands || []))}\`)" class="text-xs bg-blue-50 border border-blue-200 text-blue-600 px-3 py-1 rounded hover:bg-blue-100 transition-all flex items-center gap-1 font-medium">
                                     <i class="fa-solid fa-pen-to-square"></i> Modifica
                                 </button>
                                 <button onclick="deleteNotice('${id}')" class="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1 rounded hover:bg-red-100 transition-all flex items-center gap-1 font-medium">
@@ -691,13 +738,18 @@
 
             updateVariantOptions();
 
-            // Configurazione loghi sciopero in modalità modifica
+            // Configurazione loghi dinamici in modalità modifica
+            dynamicLogosContainer.innerHTML = "";
             if (type === "Sciopero") {
                 strikeLogosSection.classList.remove('hidden');
                 try {
                     const brands = JSON.parse(strikeBrandsJson);
-                    document.querySelectorAll('input[name="strike-brands"]').forEach(cb => {
-                        cb.checked = brands.includes(cb.value);
+                    brands.forEach(b => {
+                        if (typeof b === 'string') {
+                            createLogoRow('', b);
+                        } else {
+                            createLogoRow(b.url || '', b.alt || '');
+                        }
                     });
                 } catch(e) { console.error("Errore nell'estrazione dei brand di sciopero"); }
             } else {
@@ -717,6 +769,7 @@
         function resetForm() {
             noticeForm.reset();
             document.getElementById('notice-id').value = "";
+            dynamicLogosContainer.innerHTML = "";
             strikeLogosSection.classList.add('hidden');
             updateVariantOptions();
             
