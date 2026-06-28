@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidente a Nancy - Aviation Eagle Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: radial-gradient(circle at top right, #fff5f5 0%, #f1f5f9 100%); background-attachment: fixed; min-h-screen flex flex-col p-4 md:p-8 justify-center items-center; font-family: system-ui, -apple-system, sans-serif; }
+        .glass-card { background: rgba(255, 245, 245, 0.45); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body>
+    <main class="max-w-3xl w-full mx-auto glass-card p-6 md:p-12 rounded-[32px] transition-all duration-300 border-2 border-red-400/40 shadow-xl shadow-red-500/5 space-y-6">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-5">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-xs px-2.5 py-1 rounded-lg font-mono tracking-wider bg-red-500/10 text-red-700 border border-red-200/60 font-bold animate-pulse">HIGH</span>
+                <span class="text-xs bg-white/60 text-gray-600 border border-gray-200/40 px-2.5 py-1 rounded-lg font-semibold shadow-sm">Flotta</span>
+            </div>
+            <span class="text-xs text-gray-400 font-mono bg-white/40 px-2 py-1 rounded-md border border-gray-200/20"><i class="fa-regular fa-clock text-gray-400 mr-1"></i>28/06/2026, 16:05:23 LT</span>
+        </div>
+        
+        <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug drop-shadow-sm">Incidente a Nancy</h1>
+        
+        
+
+        <div class="text-gray-700 text-base md:text-lg whitespace-pre-wrap leading-relaxed space-y-4 pt-2 font-normal">
+            Grave incidente a Nancy, muoiono 11 persone su di un aereo turistico che avrebbe dovuto paracadutarli con il tandem.
+In corso le operazioni del BEA. 
+        </div>
+
+        <div class="pt-6 border-t border-gray-200/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <img src="https://avvisi.aviationeagle.co.uk/Aviation-Eagle-Ex-RGB.png" alt="Logo" class="h-6 w-auto object-contain filter drop-shadow-sm">
+                <span class="text-xs text-gray-400 font-medium tracking-wide">Aviation Eagle Operations Network</span>
+            </div>
+            <button onclick="window.close()" class="text-xs bg-white/80 hover:bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-all font-medium shadow-sm active:scale-95">
+                Chiudi Finestra
+            </button>
+        </div>
+    </main>
+</body>
+</html>
